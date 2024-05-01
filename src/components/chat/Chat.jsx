@@ -16,7 +16,7 @@ const Chat = () => {
         url: ""
     })
     const { currentUser } = useUserStore()
-    const { chatId, user } = useChatStore()
+    const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } = useChatStore()
     const endRef = useRef(null)
     useEffect(() => {
         endRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -84,9 +84,9 @@ const Chat = () => {
         <div className="chat">
             <div className="top">
                 <div className="user">
-                    <img src="./avatar.png" alt="" />
+                    <img src={user?.avatar || "./avatar.png"} alt="" />
                     <div className="texts">
-                        <span>John Doe</span>
+                        <span>{user?.username}</span>
                         <p>Lorem ipsum dolor sit</p>
                     </div>
                 </div>
@@ -132,9 +132,10 @@ const Chat = () => {
                 </div>
                 <input 
                     type="text" 
-                    placeholder="Type a message..." 
+                    placeholder={isCurrentUserBlocked || isReceiverBlocked ? "You cannot send a message" : "Type a message..."} 
                     value={text}
-                    onChange={(e) => setText(e.target.value)}/>
+                    onChange={(e) => setText(e.target.value)}
+                    disabled={isCurrentUserBlocked || isReceiverBlocked}/>
                 <div className="emoji">
                     <img 
                         src="./emoji.png"
@@ -143,7 +144,12 @@ const Chat = () => {
                         <EmojiPicker open={open} onEmojiClick={handleEmoji}/>
                     </div>
                 </div>
-                <button className="sendButton" onClick={handleSend}>Send</button>
+                <button 
+                    className="sendButton" 
+                    onClick={handleSend} 
+                    disabled={isCurrentUserBlocked || isReceiverBlocked}>
+                    Send
+                </button>
             </div>
         </div>
     )
