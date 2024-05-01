@@ -3,23 +3,25 @@ import "./chat.css"
 import EmojiPicker from "emoji-picker-react"
 import { doc, onSnapshot } from "firebase/firestore"
 import { db } from "../../lib/firebase"
+import { useChatStore } from "../../lib/chatStore"
 
 const Chat = () => {
     const [chat, setChat] = useState(false)
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
+    const {chatId} = useChatStore()
     const endRef = useRef(null)
     useEffect(() => {
         endRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [])
     useEffect(() => {
-        const unSub = onSnapshot(doc(db, "chats", ""), (res) => {
+        const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
             setChat(res.data())
         })
         return () => {
             unSub()
         }
-    }, [])
+    }, [chatId])
     const handleEmoji = (e) => {
         setText((prev) => prev + e.emoji)
         setOpen(false)
@@ -41,46 +43,15 @@ const Chat = () => {
                 </div>
             </div>
             <div className="center">
-                <div className="message">
-                    <img src="./avatar.png" alt="" />
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut obcaecati, autem fugiat vitae ullam soluta iste quaerat esse eligendi laudantium libero. Dolorem voluptates alias nihil, dolorum sint consequuntur voluptatem consequatur?</p>
-                        <span>1 min ago</span>
+                {chat?.messages?.map((message) => (
+                    <div className="message own" key={message?.createdAt}>
+                        <div className="texts">
+                            {message.img && <img src={message.img} />}
+                            <p>{message.text}</p>
+                            <span>1 min ago</span>
+                        </div>
                     </div>
-                </div>
-                <div className="message own">
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut obcaecati, autem fugiat vitae ullam soluta iste quaerat esse eligendi laudantium libero. Dolorem voluptates alias nihil, dolorum sint consequuntur voluptatem consequatur?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="./avatar.png" alt="" />
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut obcaecati, autem fugiat vitae ullam soluta iste quaerat esse eligendi laudantium libero. Dolorem voluptates alias nihil, dolorum sint consequuntur voluptatem consequatur?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
-                <div className="message own">
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut obcaecati, autem fugiat vitae ullam soluta iste quaerat esse eligendi laudantium libero. Dolorem voluptates alias nihil, dolorum sint consequuntur voluptatem consequatur?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
-                <div className="message">
-                    <img src="./avatar.png" alt="" />
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut obcaecati, autem fugiat vitae ullam soluta iste quaerat esse eligendi laudantium libero. Dolorem voluptates alias nihil, dolorum sint consequuntur voluptatem consequatur?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
-                <div className="message own">
-                    <div className="texts">
-                        <img src="https://images.pexels.com/photos/19503566/pexels-photo-19503566/free-photo-of-yellow-roof-on-a-petrol-station.jpeg" alt="" />
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut obcaecati, autem fugiat vitae ullam soluta iste quaerat esse eligendi laudantium libero. Dolorem voluptates alias nihil, dolorum sint consequuntur voluptatem consequatur?</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
+                ))}
                 <div ref={endRef}></div>
             </div>
             <div className="bottom">
