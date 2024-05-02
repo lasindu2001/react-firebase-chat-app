@@ -6,7 +6,7 @@ import { useUserStore } from "../../../../lib/userStore"
 
 const AddUser = () => {
     const [user, setUser] = useState(null)
-    const {currentUser} = useUserStore
+    const {currentUser} = useUserStore()
     const handleSearch = async (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
@@ -57,13 +57,13 @@ const AddUser = () => {
                 <input type="text" placeholder="Username" name="username" />
                 <button>Search</button>
             </form>
-            {user && <div className="user">
+            {user && (<div className="user">
                 <div className="detail">
                     <img src={user.avatar || "./avatar.png"} alt="" />
                     <span>{user.username}</span>
                 </div>
                 <button onClick={handleAdd}>Add User</button>
-            </div>}
+            </div>)}
         </div>
     )
 }

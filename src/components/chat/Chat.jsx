@@ -8,7 +8,7 @@ import { useUserStore } from "../../lib/userStore"
 import upload from "../../lib/upload"
 
 const Chat = () => {
-    const [chat, setChat] = useState(false)
+    const [chat, setChat] = useState()
     const [open, setOpen] = useState(false)
     const [text, setText] = useState("")
     const [img, setImg] = useState({
@@ -20,7 +20,7 @@ const Chat = () => {
     const endRef = useRef(null)
     useEffect(() => {
         endRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [])
+    }, [chat.messages])
     useEffect(() => {
         const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
             setChat(res.data())
@@ -62,7 +62,7 @@ const Chat = () => {
                 const userChatsSnapshot = await getDoc(userChatsRef)
                 if(userChatsSnapshot.exists()) {
                     const userChatsData = userChatsSnapshot.data()
-                    const chatIndex = userChatsData.chats.findIndex((c) => c.id === chatId)
+                    const chatIndex = userChatsData.chats.findIndex((c) => c.chatId === chatId)
                     userChatsData.chats[chatIndex].lastMessage = text
                     userChatsData.chats[chatIndex].isSeen = id === currentUser.id ? true : false
                     userChatsData.chats[chatIndex].updatedAt = Date.now()
@@ -73,12 +73,13 @@ const Chat = () => {
             })
         } catch (error) {
             console.log(error);
+        } finally {
+            setImg({
+                file: null,
+                url: ""
+            })
+            setText("")
         }
-        setImg({
-            file: null,
-            url: ""
-        })
-        setText("")
     }
     return (
         <div className="chat">
